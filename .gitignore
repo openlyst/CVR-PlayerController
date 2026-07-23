@@ -1,0 +1,23 @@
+# Build output
+dist/
+[Bb]in/
+[Oo]bj/
+
+# Proprietary game/Unity assemblies — needed to build, not ours to redistribute.
+# See README for where to source these locally.
+libs/
+
+# Local build/reference material (third-party mod source + decompiled game code).
+reference/
+
+# IDE / editor
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# OS cruft
+Thumbs.db
+desktop.ini
+.DS_Store

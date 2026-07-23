@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>PlayerRemoteControl</AssemblyName>
+    <RootNamespace>PlayerRemoteControl</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>CS0649;CS0169;CS0618</NoWarn>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- All references resolve from the local .\libs copy, never the game install. -->
+  <ItemGroup>
+    <Reference Include="MelonLoader">        <HintPath>$(LibsDir)\MelonLoader.dll</HintPath>        <Private>false</Private></Reference>
+    <Reference Include="0Harmony">           <HintPath>$(LibsDir)\0Harmony.dll</HintPath>           <Private>false</Private></Reference>
+    <Reference Include="NicoKuroKusagi">     <HintPath>$(LibsDir)\NicoKuroKusagi.dll</HintPath>     <Private>false</Private></Reference>
+    <Reference Include="ECM2">               <HintPath>$(LibsDir)\ECM2.dll</HintPath>               <Private>false</Private></Reference>
+    <Reference Include="Assembly-CSharp" Publicize="true"><HintPath>$(LibsDir)\Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="DarkRift">           <HintPath>$(LibsDir)\DarkRift.dll</HintPath>           <Private>false</Private></Reference>
+    <Reference Include="DarkRift.Client">    <HintPath>$(LibsDir)\DarkRift.Client.dll</HintPath>    <Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(LibsDir)\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.AnimationModule"><HintPath>$(LibsDir)\UnityEngine.AnimationModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.InputLegacyModule"><HintPath>$(LibsDir)\UnityEngine.InputLegacyModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.AudioModule"><HintPath>$(LibsDir)\UnityEngine.AudioModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine">        <HintPath>$(LibsDir)\UnityEngine.dll</HintPath>        <Private>false</Private></Reference>
+    <Reference Include="Newtonsoft.Json">    <HintPath>$(LibsDir)\Newtonsoft.Json.dll</HintPath>    <Private>false</Private></Reference>
+    <Reference Include="BTKUILib">           <HintPath>$(LibsDir)\BTKUILib.dll</HintPath>           <Private>false</Private></Reference>
+  </ItemGroup>
+
+  <!-- Output the built mod to the local .\dist folder. Installing into the game is a manual copy;
+       the build never touches the ChilloutVR install. -->
+  <Target Name="CopyToDist" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(DistDir)" ContinueOnError="true" />
+    <Message Importance="high" Text="Built -> $(DistDir)\$(AssemblyName).dll  (copy manually into ChilloutVR\Mods to install)" />
+  </Target>
+
+</Project>

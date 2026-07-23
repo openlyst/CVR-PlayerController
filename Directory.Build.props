@@ -1,0 +1,8 @@
+<Project>
+  <!-- Self-contained build: all game/mod reference assemblies live in .\libs (copied out of the
+       ChilloutVR install). Nothing here reads from or writes to the game folder. -->
+  <PropertyGroup>
+    <LibsDir>$(MSBuildThisFileDirectory)libs</LibsDir>
+    <DistDir>$(MSBuildThisFileDirectory)dist</DistDir>
+  </PropertyGroup>
+</Project>
