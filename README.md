@@ -20,9 +20,9 @@ Download the latest release DLL and place it into your Mods folder next to your 
 
 ## How to use
 
-For **being controlled**, enable the "Allow being controlled" from the mod's BTKUI tab and configure your permission preferences and optionally a whitelist.
+For **being controlled**, enable "Allow being controlled" from the mod's BTKUI tab and configure your permission preferences and optionally a whitelist.
 
-For **controlling another user**, ensure that the target has control consent enabled and their whitelist configured properly, and click the user's name from the control tab.
+For **controlling another user**, ensure that the target has control consent enabled and their whitelist is configured properly, and click the user's name from the control tab.
 
 ## Building
 
