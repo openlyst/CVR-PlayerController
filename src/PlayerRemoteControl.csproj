@@ -16,6 +16,13 @@
     <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
   </ItemGroup>
 
+  <!-- Fail early with a clear message if libs\ hasn't been populated, instead of a wall of
+       CS0246 "type not found" errors. These DLLs are the game's/MelonLoader's to distribute. -->
+  <Target Name="CheckLibs" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="!Exists('$(LibsDir)\Assembly-CSharp.dll')"
+           Text="Reference assemblies are missing. Create a 'libs' folder at the repo root and copy the game/MelonLoader/mod DLLs into it (Assembly-CSharp.dll, MelonLoader.dll, BTKUILib.dll, the UnityEngine.* modules, etc.). See the csproj Reference list for the full set." />
+  </Target>
+
   <!-- All references resolve from the local .\libs copy, never the game install. -->
   <ItemGroup>
     <Reference Include="MelonLoader">        <HintPath>$(LibsDir)\MelonLoader.dll</HintPath>        <Private>false</Private></Reference>
