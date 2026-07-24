@@ -103,6 +103,12 @@ public sealed class PlayerRemoteControlMod : MelonMod
                     Transport.Send(sender, new[] { (byte)PacketType.DeclineControl });
                     return;
                 }
+                if (Controlled != null)
+                {
+                    LoggerInstance.Msg($"Declining control request from {sender} (already being controlled).");
+                    Transport.Send(sender, new[] { (byte)PacketType.DeclineControl });
+                    return;
+                }
                 Controlled?.Stop();
                 Controlled = new PuppetSession(sender, profile);
                 Controlled.AcceptControl();
