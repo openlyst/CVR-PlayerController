@@ -26,7 +26,6 @@ internal sealed class PuppetSession
     // Issued to the controller in AcceptControl; every inbound control packet must echo it back.
     private uint _token;
     private float _nextConsentCheck;
-    private bool _anchoring;
 
     internal bool TryAuthenticate(byte[] payload, out byte[] inner) => ControlPacket.Unwrap(payload, _token, out inner);
     internal byte[] Authenticate(byte[] payload) => ControlPacket.Wrap(payload, _token);
@@ -67,21 +66,14 @@ internal sealed class PuppetSession
         Profile = profile ?? Settings.DefaultProfile();
     }
 
-    // True when the puppet keeps their own head/view (head-only). Camera, AudioListener and head-hide
-    // then stay fully native. Anchoring the camera would fight the HMD and make the listener oscillate
-    // (voices pulse). The controller still drives the body minus head.
-    private bool RetainsView => Profile.ForceFreeLook;
-
     internal void AcceptControl()
     {
         Active = this;
-        // Only anchor the view (and hide the head) when actually taking over the puppet's view.
-        _anchoring = !RetainsView;
-        if (_anchoring)
-        {
-            _view.Enable();
-            _headHide.Enable();
-        }
+        // Always anchor the view position and glue the AudioListener to the controller's viewpoint
+        // while controlled. Retaining the head only unlocks the puppet's own head rotation (free-look);
+        // it is not a reason to stop anchoring, or the body relocates while the view stays behind.
+        _view.Enable();
+        _headHide.Enable();
         // Issue a fresh per-session token; the controller echoes it in every control packet.
         _token = ControlPacket.NewToken();
         PlayerRemoteControlMod.Instance.Transport.Send(ControllerUuid,
@@ -328,15 +320,7 @@ internal sealed class PuppetSession
         Profile = fresh;
         if (!Profile.AllowVoiceOverride) _voice.SetVoiceOverride(false);
         if (!Profile.AllowMute) _voice.SetMute(false);
-
-        // Toggling head-retain mid-session flips whether we anchor the view / hide the head.
-        bool anchor = !RetainsView;
-        if (anchor != _anchoring)
-        {
-            _anchoring = anchor;
-            if (anchor) { _view.Enable(); _headHide.Enable(); }
-            else { _view.Disable(); _headHide.Disable(); }
-        }
+        // Head-retain no longer toggles anchoring; it only flips the rotation lock, handled in Update.
         return false;
     }
 
@@ -344,19 +328,19 @@ internal sealed class PuppetSession
     {
         if (CheckPanic()) return;
         if (RevalidateConsent()) return;
-        if (!RetainsView)
+
+        // Anchor the view every frame. Free-look (the toggle, or forced when the head is retained)
+        // only unlocks rotation so the puppet keeps their own look; position stays anchored either way.
+        bool locked = !FreeLook;
+        _view.RotationLocked = locked;
+        _view.LevelHorizon = Settings.LevelHorizonWhileControlled.Value;
+        if (locked != _lastRotationLocked)
         {
-            bool locked = !FreeLook;
-            _view.RotationLocked = locked;
-            _view.LevelHorizon = Settings.LevelHorizonWhileControlled.Value;
-            if (locked != _lastRotationLocked)
-            {
-                _lastRotationLocked = locked;
-                _view.ForceReanchor(); // re-drive the camera immediately on the toggle
-                if (locked) PlayerRemoteControlMod.Log.Msg("Free-look off; resuming camera/rig drive.");
-            }
-            _headHide.Update();
+            _lastRotationLocked = locked;
+            _view.ForceReanchor(); // re-drive the camera immediately on the toggle
+            if (locked) PlayerRemoteControlMod.Log.Msg("Free-look off; resuming camera/rig drive.");
         }
+        _headHide.Update();
         MovePuppetBody();
         _voice.Update(ControllerUuid);
         LogViewOffset();

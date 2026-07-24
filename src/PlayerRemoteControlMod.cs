@@ -109,7 +109,6 @@ public sealed class PlayerRemoteControlMod : MelonMod
                     Transport.Send(sender, new[] { (byte)PacketType.DeclineControl });
                     return;
                 }
-                Controlled?.Stop();
                 Controlled = new PuppetSession(sender, profile);
                 Controlled.AcceptControl();
                 LoggerInstance.Msg($"Accepted control from {sender}.");
