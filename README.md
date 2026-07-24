@@ -35,4 +35,4 @@ dotnet build src/PlayerRemoteControl.csproj -c Release
 ## TODO
 
 - Per-limb permissions are not reliably tested, and have anchoring/orientation issues at the root
-- Added icons to the menu entries
+- Add icons to the menu entries
