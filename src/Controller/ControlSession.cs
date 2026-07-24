@@ -255,7 +255,8 @@ internal sealed class ControlSession
         if (VoiceOverrideOn) { VoiceOverrideOn = false; MutePuppetPipelineLocally(false); }
         _voiceMonitor?.Dispose();
         _voiceMonitor = null;
-        PlayerRemoteControlMod.Instance.Transport.Send(TargetUuid, new[] { (byte)PacketType.StopControl });
+        // Token-stamped so the puppet can verify the stop came from this session's controller.
+        PlayerRemoteControlMod.Instance.Transport.Send(TargetUuid, Authenticate(new[] { (byte)PacketType.StopControl }));
 
         // Undo the local wear (head-hide restore + un-hide the puppet). Doesn't touch the networked
         // avatar, which is restored just below.

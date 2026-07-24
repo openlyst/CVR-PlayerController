@@ -123,8 +123,12 @@ public sealed class PlayerRemoteControlMod : MelonMod
                 break;
 
             case PacketType.StopControl:
-                if (Controlled != null && Controlled.ControllerUuid == sender) { Controlled.Stop(); Controlled = null; }
-                if (Controlling != null && Controlling.TargetUuid == sender) { Controlling.Stop(); Controlling = null; }
+                // Authenticated like the data packets: only the token-holding counterparty can end the
+                // session, so a spoofed sender can't forcibly terminate an active one.
+                if (Controlled != null && Controlled.ControllerUuid == sender
+                    && Controlled.TryAuthenticate(payload, out _)) { Controlled.Stop(); Controlled = null; }
+                else if (Controlling != null && Controlling.TargetUuid == sender
+                    && Controlling.TryAuthenticate(payload, out _)) { Controlling.Stop(); Controlling = null; }
                 break;
 
             case PacketType.Pose:

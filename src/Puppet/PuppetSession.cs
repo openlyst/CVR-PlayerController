@@ -376,7 +376,9 @@ internal sealed class PuppetSession
         _view.Disable();
         _headHide.Disable();
         _voice.Restore();
-        PlayerRemoteControlMod.Instance.Transport.Send(ControllerUuid, new[] { (byte)PacketType.StopControl });
+        // Token-stamped like the data packets: session termination is authenticated too, so a spoofed
+        // sender can't forcibly end someone else's active session.
+        PlayerRemoteControlMod.Instance.Transport.Send(ControllerUuid, Authenticate(new[] { (byte)PacketType.StopControl }));
         PlayerRemoteControlMod.Log.Msg("Control ended (puppet restored).");
     }
 }
