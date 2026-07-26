@@ -36,3 +36,7 @@ dotnet build src/PlayerRemoteControl.csproj -c Release
 
 - Per-limb permissions are not reliably tested, and have anchoring/orientation issues at the root
 - Add icons to the menu entries
+
+## NOTICE
+
+This modification is not endorsed, affiliated, or approved by the ChilloutVR Team in any manner. You are responsible for any action taken against you during the use of this modification.
